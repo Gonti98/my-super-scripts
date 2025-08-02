@@ -1,0 +1,48 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: "${PROJECT_NAME}"
+  namespace: "${ARGOCD_NAMESPACE}"
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - list:
+        elements:
+          - cluster: "${CLUSTER_NAME}"
+            url: "${CLUSTER_URL}"
+            namespace: "${APPSET_NAMESPACE}"
+  template:
+    metadata:
+      name: "${PROJECT_NAME}"
+      namespace: "${APPSET_NAMESPACE}"
+    spec:
+      project: "${PROJECT_NAME}-${ENVIRONMENT}"
+      source:
+        repoURL: https://github.com/your-org/your-repo.git
+        targetRevision: main
+        path: applications/workflows
+        helm:
+          valueFiles:
+            - "../../environments/${ENVIRONMENT}/values.yaml"
+            - "values.yaml"
+          ignoreMissingValueFiles: false
+      destination:
+        server: "${CLUSTER_URL}"
+        namespace: "${APPSET_NAMESPACE}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        managedNamespaceMetadata:
+          labels:
+            argocd.argoproj.io/instance: "${APPSET_NAMESPACE}"
+            app.kubernetes.io/instance: "${APPSET_NAMESPACE}"
+          annotations:
+            argocd.argoproj.io/tracking-id: "${APPSET_NAMESPACE}:apps/Namespace:${APPSET_NAMESPACE}/${APPSET_NAMESPACE}"
+        syncOptions:
+          - CreateNamespace=true
+
+
