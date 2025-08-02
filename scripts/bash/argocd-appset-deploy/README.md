@@ -1,6 +1,6 @@
 # ArgoCD ApplicationSet – Example Deployment Script
 
-This repository contains an example Bash script and template for generating
+This folder contains a Bash script and template for generating
 and deploying an [ArgoCD ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/)
 using environment-specific configuration and HashiCorp Vault for secrets.
 
@@ -21,13 +21,13 @@ using environment-specific configuration and HashiCorp Vault for secrets.
 
 ## Usage
 
-### 1. Prepare environment
+### 1. Prepare your environment
 
-Create a directory with your environment name under `environments/`, and copy the example `shell.env`
+Create a directory with your environment name under `environments/`, and copy the example `shell.env`:
 
-Edit `environments/dev/shell.env` to match your setup (see [Environment Variables](#-environment-variables)).
+Edit `environments/dev/shell.env` to match your setup.
 
-> **Note**: Do not commit real secrets or credentials. This is an example only.
+Note: Do not commit real secrets or credentials. This is an example only.
 
 ### 2. Run the script
 
@@ -35,13 +35,13 @@ Edit `environments/dev/shell.env` to match your setup (see [Environment Variable
 ./argocd-appset-generate-and-deploy.sh <environment-name> [flags]
 ```
 
-#### Example:
+#### Example
 
 ```bash
 ./argocd-appset-generate-and-deploy.sh dev --upsert --verbose
 ```
 
-#### Available flags:
+#### Available flags
 
 * `-d`, `--dry-run` – Generate and show manifest without applying changes
 * `-u`, `--upsert` – Create or update resources in ArgoCD
@@ -69,7 +69,7 @@ It retrieves the secret using:
 vault kv get --field="${REPO_VAULT_PASSWORD_KEY}" "${REPO_VAULT_PASSWORD_PATH}"
 ```
 
-Ensure Vault CLI is authenticated before running the script.
+Make sure the Vault CLI is authenticated before running the script.
 
 ## Environment Variables
 
@@ -90,30 +90,20 @@ These must be defined in `environments/<env>/shell.env`:
 The file `applicationsets/template.yaml` contains a YAML template using
 environment variables (in `${...}` syntax), rendered by `envsubst`.
 
-Example fields to update in the template:
+Update fields like:
 
 ```yaml
 repoURL: "https://github.com/your-org/your-repo.git"
 targetRevision: "main"
 ```
 
-> These can be hardcoded in the template or passed in dynamically via environment variables.
-
-## Security Note
-
-* Do not commit real credentials or secrets to this repo.
-* Use `.gitignore` to exclude any real `shell.env` files:
-
- ```bash
- environments/*/shell.env
- !example-env/shell.env
- ```
+These can be hardcoded in the template or passed dynamically via environment variables.
 
 ## Dependencies
 
-Make sure the following tools are available in your `$PATH`:
+Ensure the following tools are available in your system:
 
-* `vault`
-* `argocd`
-* `envsubst` (typically from GNU gettext)
+* `vault` (HashiCorp Vault CLI)
+* `argocd` (ArgoCD CLI)
+* `envsubst` (from GNU gettext)
 
